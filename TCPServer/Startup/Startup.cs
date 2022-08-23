@@ -4,14 +4,17 @@ using DotNetty.Handlers.Tls;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
+using System.Net;
+using TCPServer.Packet;
 
-namespace Server
+namespace TCPServer.Startup
 {
-    public static class TCPServer {
+    public static class Startup
+    {
 
         static bool bRunning = true;
 
-        public static async Task Start()
+        public static void Start()
         {
 
             MultithreadEventLoopGroup bossGroup = new MultithreadEventLoopGroup(1);
@@ -27,27 +30,36 @@ namespace Server
                     .ChildHandler(new ActionChannelInitializer<IChannel>(channel =>
                     {
                         IChannelPipeline pipeline = channel.Pipeline;
-                    }));
+                        pipeline.AddLast(
+                            new PacketDecoder(),
+                            new PacketEncoder()
+                            );
+                    }))
+                    .ChildOption(ChannelOption.TcpNodelay, true)
+                    .ChildOption(ChannelOption.SoKeepalive, true);
 
+                IPAddress ipAdd = IPAddress.Parse("9.0.0.2");
+                IChannel bootstrapChannel = serverBootstrap.BindAsync(ipAdd, 30001).GetAwaiter().GetResult();
 
-                IChannel bootstrapChannel = await serverBootstrap.BindAsync(30001); // TODO: make this in a config
-
-                Console.CancelKeyPress += delegate (object? sender, ConsoleCancelEventArgs e) {
+                Console.CancelKeyPress += delegate (object? sender, ConsoleCancelEventArgs e)
+                {
                     e.Cancel = true;
                     Stop();
                 };
 
                 while (bRunning) ;
-                
-                await bootstrapChannel.CloseAsync();
 
-            } catch (Exception ex)
+                bootstrapChannel.CloseAsync().GetAwaiter();
+
+            }
+            catch (Exception ex)
             {
-               Console.WriteLine(ex.ToString()); // TODO: make a logger
-            } finally
+                Console.WriteLine(ex.ToString()); // TODO: make a logger
+            }
+            finally
             {
                 Task.WaitAll(bossGroup.ShutdownGracefullyAsync(), workerGroup.ShutdownGracefullyAsync());
-                Console.WriteLine("exited gracefully"); // TODO: make a logger
+                Console.WriteLine("TCP Server exited gracefully"); // TODO: make a logger
             }
         }
 
@@ -55,7 +67,5 @@ namespace Server
         {
             bRunning = false;
         }
-
-        
     }
 }
