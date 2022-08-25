@@ -13,10 +13,9 @@ namespace TCPServer.Utilities
     {
         public static String ByteBufToString(IByteBuffer _byteBuffer, int _size)
         {
-
-
-
-            return null;
+            byte[] buffer = new byte[_size];
+            _byteBuffer.ReadBytes(buffer);
+            return Convert.ToHexString(buffer);
         }
     }
 }

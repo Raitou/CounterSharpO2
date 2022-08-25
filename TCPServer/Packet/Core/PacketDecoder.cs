@@ -24,6 +24,7 @@ namespace TCPServer.Packet.Core
                 return;
             }
 
+            //if packet not found
             Console.WriteLine("" + Common.ByteBufToString(_input, _input.ReadableBytes));
         }
     }
