@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TCPServer.Packet;
+using TCPServer.Packet.Core;
 
 namespace TCPServer.Handler
 {

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPServer.Packet
+namespace TCPServer.Packet.Core
 {
-    internal class PacketOut : PacketBase
+    internal class PacketBase : PacketAbstract
     {
+
     }
 }

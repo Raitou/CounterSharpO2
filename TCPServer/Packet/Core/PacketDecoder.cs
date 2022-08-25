@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TCPServer.Utilities;
 
-namespace TCPServer.Packet
+namespace TCPServer.Packet.Core
 {
     internal class PacketDecoder : ByteToMessageDecoder
     {
@@ -23,7 +24,7 @@ namespace TCPServer.Packet
                 return;
             }
 
-            Console.WriteLine(_input.ReadString(_input.ReadableBytes, Encoding.UTF8));
+            Console.WriteLine("" + Common.ByteBufToString(_input, _input.ReadableBytes));
         }
     }
 }

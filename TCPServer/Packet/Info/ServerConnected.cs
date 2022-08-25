@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPServer.Packet
+namespace TCPServer.Packet.Info
 {
-    internal class PacketIn : PacketBase
+    internal class ServerConnected
     {
     }
 }

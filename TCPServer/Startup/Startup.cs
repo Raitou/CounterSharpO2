@@ -5,7 +5,12 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System.Net;
-using TCPServer.Packet;
+using System.Threading.Channels;
+using TCPServer.Handler;
+using TCPServer.Packet.Core;
+using TCPServer.Client;
+using System.Text;
+using DotNetty.Buffers;
 
 namespace TCPServer.Startup
 {
@@ -32,14 +37,28 @@ namespace TCPServer.Startup
                         IChannelPipeline pipeline = channel.Pipeline;
                         pipeline.AddLast(
                             new PacketDecoder(),
+                            new ChannelHandler(),
                             new PacketEncoder()
                             );
+
+                        TCPClient client = new TCPClient(channel);
+
+                        IByteBuffer byteBuffer = Unpooled.Buffer(1024);
+                        byteBuffer.WriteString("~SERVERCONNECTED\n", Encoding.UTF8);
+
+                        channel.WriteAndFlushAsync(byteBuffer).GetAwaiter().GetResult();
+                        Console.WriteLine("Client {0} is connected", client.Channel.RemoteAddress.ToString());
                     }))
                     .ChildOption(ChannelOption.TcpNodelay, true)
                     .ChildOption(ChannelOption.SoKeepalive, true);
 
-                IPAddress ipAdd = IPAddress.Parse("9.0.0.2");
-                IChannel bootstrapChannel = serverBootstrap.BindAsync(ipAdd, 30001).GetAwaiter().GetResult();
+                IChannel bootstrapChannel = serverBootstrap.BindAsync(
+                    IPAddress.Parse("10.0.0.2")
+                    , 30001
+                    ).GetAwaiter()
+                    .GetResult();
+
+                Console.WriteLine("Started TCP Server on {0}", bootstrapChannel.LocalAddress.ToString());
 
                 Console.CancelKeyPress += delegate (object? sender, ConsoleCancelEventArgs e)
                 {

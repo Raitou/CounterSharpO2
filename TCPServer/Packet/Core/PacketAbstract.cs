@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPServer.Packet
+namespace TCPServer.Packet.Core
 {
     public abstract class PacketAbstract : ICloneable
     {
         public object Clone()
         {
-            return this.MemberwiseClone();
+            return MemberwiseClone();
         }
     }
 }
