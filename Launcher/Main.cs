@@ -1,5 +1,4 @@
-﻿using TCPServer.Startup;
-/***
+﻿/***
  * Base Launcher can be anything so long as you reference the C# Library
  */
 
@@ -15,7 +14,12 @@ namespace Launcher
         static void Main(string[] args)
         {
             Console.WriteLine("CounterSharpO2 Project");
-            Thread TCPThread = new Thread(new ThreadStart(Startup.Start));
+            Thread TCPThread = new Thread(new ThreadStart(
+                TCPServer
+                .Startup
+                .Startup
+                .Start)
+                );
 
 
             // Start TCP Server

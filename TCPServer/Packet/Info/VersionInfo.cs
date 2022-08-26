@@ -1,22 +1,28 @@
 ﻿using Common.Packet;
 using DotNetty.Buffers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace TCPServer.Packet.Info
 {
-    internal class ServerConnected : IPacket
+    internal class VersionInfo : IPacket
     {
-        public String StrMessage { get; set; }
+        public string Version { get; set; }
+
         private IByteBuffer _buffer = Unpooled.Buffer(1024);
-        public ServerConnected(string strMessage)
+        public VersionInfo(string versionHash)
         {
-            StrMessage = strMessage;
+            Version = versionHash;
         }
 
         public IPacket BuildPacket()
         {
-            _buffer.Clear();
-            _buffer.WriteString(StrMessage, Encoding.UTF8);
+            _buffer.WriteByte(0); //packetID
+            _buffer.WriteByte(0); //isbadhash
+            _buffer.WriteString(Version, Encoding.ASCII); //versionhashh
             return this;
         }
 

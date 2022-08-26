@@ -29,14 +29,14 @@ namespace TCPServer.Startup
                     .Channel<TcpServerSocketChannel>()
                     .ChildHandler(new ActionChannelInitializer<IChannel>(channel =>
                     {
+                        TCPClient client = new TCPClient(channel);
                         IChannelPipeline pipeline = channel.Pipeline;
                         pipeline.AddLast(
-                            new PacketDecoder(),
+                            new PacketDecoder(client),
                             new ChannelHandler(),
-                            new PacketEncoder()
+                            new PacketEncoder(client)
                             );
 
-                        TCPClient client = new TCPClient(channel);
                         ServerConnected serverConnected = new ServerConnected(strMessage: "~SERVERCONNECTED\n");
                         client.Send(serverConnected);
 
@@ -45,6 +45,7 @@ namespace TCPServer.Startup
                     .ChildOption(ChannelOption.TcpNodelay, true)
                     .ChildOption(ChannelOption.SoKeepalive, true);
 
+                // TODO: Move this to config
                 IChannel bootstrapChannel = serverBootstrap.BindAsync(
                     IPAddress.Parse("10.0.0.2")
                     , 30001

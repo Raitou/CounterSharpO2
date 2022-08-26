@@ -1,19 +1,54 @@
-﻿using DotNetty.Buffers;
+﻿using Common.Packet;
+using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TCPServer.Client;
 
 namespace TCPServer.Packet.Core
 {
-    internal class PacketEncoder : MessageToByteEncoder<IPacketInterface>
+    internal class PacketEncoder : MessageToByteEncoder<IPacket>
     {
-        protected override void Encode(IChannelHandlerContext context, IPacketInterface message, IByteBuffer output)
+        private TCPClient _client;
+        public PacketEncoder(TCPClient client)
         {
-            throw new NotImplementedException();
+            _client = client;
+        }
+
+        private readonly object _lock = new object();
+        protected override void Encode(IChannelHandlerContext context, IPacket message, IByteBuffer output)
+        {
+            lock (_lock)
+            {
+                try
+                {
+                    if (message.GetPacket() == null)
+                        throw new Exception();
+
+                    output.WriteByte(createHeader());
+                    output.WriteByte(getSequence());
+                    output.WriteShortLE(message.GetPacket().ReadableBytes);
+                    output.WriteBytes(message.GetPacket());
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    if (message.GetPacket() != null)
+                        message.GetPacket().Clear();
+                }
+            }
+        }
+
+        private byte createHeader()
+        {
+            return 0x55; // PacketSignature
+        }
+
+        private byte getSequence()
+        {
+            return _client.Sequence++;
         }
     }
 }
