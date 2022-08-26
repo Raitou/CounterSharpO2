@@ -1,9 +1,5 @@
 ﻿using DotNetty.Transport.Channels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TCPServer.Packet.Core;
 
 namespace TCPServer.Client
 {
@@ -15,6 +11,16 @@ namespace TCPServer.Client
         public TCPClient(IChannel _ch)
         {
             Channel = _ch;
+        }
+
+        public void Send(IPacketInterface _packet)
+        {
+            Channel.WriteAndFlushAsync(
+                _packet
+                .BuildPacket()
+                .GetPacket())
+            .GetAwaiter()
+            .GetResult();
         }
     }
 }

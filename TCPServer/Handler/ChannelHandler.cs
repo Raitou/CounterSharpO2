@@ -8,9 +8,9 @@ using TCPServer.Packet.Core;
 
 namespace TCPServer.Handler
 {
-    internal class ChannelHandler : SimpleChannelInboundHandler<PacketIn>
+    internal class ChannelHandler : SimpleChannelInboundHandler<IPacketInterface>
     {
-        protected override void ChannelRead0(IChannelHandlerContext ctx, PacketIn msg)
+        protected override void ChannelRead0(IChannelHandlerContext ctx, IPacketInterface msg)
         {
             // do nothing
         }

@@ -1,16 +1,11 @@
-﻿using DotNetty.Codecs;
-using DotNetty.Handlers.Logging;
-using DotNetty.Handlers.Tls;
-using DotNetty.Transport.Bootstrapping;
+﻿using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System.Net;
-using System.Threading.Channels;
 using TCPServer.Handler;
 using TCPServer.Packet.Core;
 using TCPServer.Client;
-using System.Text;
-using DotNetty.Buffers;
+using TCPServer.Packet.Info;
 
 namespace TCPServer.Startup
 {
@@ -42,11 +37,9 @@ namespace TCPServer.Startup
                             );
 
                         TCPClient client = new TCPClient(channel);
+                        ServerConnected serverConnected = new ServerConnected(strMessage: "~SERVERCONNECTED\n");
+                        client.Send(serverConnected);
 
-                        IByteBuffer byteBuffer = Unpooled.Buffer(1024);
-                        byteBuffer.WriteString("~SERVERCONNECTED\n", Encoding.UTF8);
-
-                        channel.WriteAndFlushAsync(byteBuffer).GetAwaiter().GetResult();
                         Console.WriteLine("Client {0} is connected", client.Channel.RemoteAddress.ToString());
                     }))
                     .ChildOption(ChannelOption.TcpNodelay, true)

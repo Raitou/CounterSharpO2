@@ -9,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace TCPServer.Packet.Core
 {
-    internal class PacketEncoder : MessageToByteEncoder<PacketOut>
+    internal class PacketEncoder : MessageToByteEncoder<IPacketInterface>
     {
-        protected override void Encode(IChannelHandlerContext context, PacketOut message, IByteBuffer output)
+        protected override void Encode(IChannelHandlerContext context, IPacketInterface message, IByteBuffer output)
         {
-            Console.WriteLine("aaaaaaaaa");
             throw new NotImplementedException();
         }
     }
