@@ -1,28 +1,26 @@
 ﻿using Common.Packet;
+using Common.Packet.Enum;
 using DotNetty.Buffers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TCPServer.Packet.Info
 {
     internal class VersionInfo : IPacket
     {
         public string Version { get; set; }
-
-        private IByteBuffer _buffer = Unpooled.Buffer(1024);
-        public VersionInfo(string versionHash)
+        private bool _isBadhash = false;
+        public VersionInfo(string versionHash, bool isBadHash = false)
         {
             Version = versionHash;
+            _isBadhash = isBadHash;
         }
 
+        private IByteBuffer _buffer = Unpooled.Buffer(1024);
         public IPacket BuildPacket()
         {
-            _buffer.WriteByte(0); //packetID
-            _buffer.WriteByte(0); //isbadhash
-            _buffer.WriteString(Version, Encoding.ASCII); //versionhashh
+            _buffer.WriteByte((int)PacketID.VersionInfo);
+            _buffer.WriteBoolean(_isBadhash);
+            _buffer.WriteString(Version, Encoding.ASCII);
             return this;
         }
 

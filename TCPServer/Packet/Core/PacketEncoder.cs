@@ -26,7 +26,9 @@ namespace TCPServer.Packet.Core
 
                     output.WriteByte(createHeader());
                     output.WriteByte(getSequence());
+#pragma warning disable CS8602 // Null check already defined above
                     output.WriteShortLE(message.GetPacket().ReadableBytes);
+#pragma warning restore CS8602
                     output.WriteBytes(message.GetPacket());
                 }
                 catch(Exception ex)
@@ -36,7 +38,9 @@ namespace TCPServer.Packet.Core
                 finally
                 {
                     if (message.GetPacket() != null)
+#pragma warning disable CS8602 // Null check already defined above
                         message.GetPacket().Clear();
+#pragma warning restore CS8602
                 }
             }
         }
