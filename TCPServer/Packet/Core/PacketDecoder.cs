@@ -1,4 +1,5 @@
-﻿using Common.Utilities;
+﻿using Common.Packet.Enum;
+using Common.Utilities;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
@@ -29,16 +30,26 @@ namespace TCPServer.Packet.Core
                     {
                         throw new IndexOutOfRangeException();
                     }
-                    if (validateHeader(_input) != true)
+                    byte header = _input.ReadByte();
+                    if (validateHeader(header) != true)
                     {
-                        throw new IndexOutOfRangeException(); // todo: disconnect client for now just ignore
+                        throw new Exception(String.Format("Invalid Header. Header expect {0} but received {1}", 
+                            PacketSignature.TCPSignature,
+                            header));
                     }
-                    setSequence(_input.ReadByte());
+                    byte seq = _input.ReadByte();
+                    if (validateSequence(seq) != true)
+                    {
+                        throw new Exception(String.Format("Invalid sequence. Sequence expect {0} but received {1}", 
+                            _client.Sequence, 
+                            seq));
+                    }
+                    setSequence(seq);
                     _output.Add(new PacketData(parseRawData(_input)));
                 }
-                catch (IndexOutOfRangeException ex)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Console.WriteLine(ex.Message);
                 }
                 finally
                 {
@@ -56,14 +67,23 @@ namespace TCPServer.Packet.Core
             return packetData;
         }
 
+        private bool validateSequence(byte _seq)
+        {
+            if (_client.Sequence == _seq) //if initial sequence
+                return true;
+            if (_client.Sequence + 1 == _seq) //if not initial
+                return true;
+            return false;
+        }
+
         private void setSequence(byte _seq)
         {
             _client.Sequence = _seq;
         }
 
-        private bool validateHeader(IByteBuffer _input)
+        private bool validateHeader(byte _seq)
         {
-            return _input.ReadByte() == 0x55; //0x55 = PacketSignature
+            return _seq == (byte)PacketSignature.TCPSignature;
         }
     }
 }

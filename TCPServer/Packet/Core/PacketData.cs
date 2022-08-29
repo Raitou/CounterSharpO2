@@ -14,7 +14,6 @@ namespace TCPServer.Packet.Core
             PacketID = (PacketID)RawData[0];
             RawData = RawData.Skip(1).ToArray();
         }
-
         public PacketID PacketID { get; set; }
     }
 }

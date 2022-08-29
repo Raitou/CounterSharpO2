@@ -2,10 +2,9 @@
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System.Net;
-using TCPServer.Handler;
 using TCPServer.Packet.Core;
 using TCPServer.Client;
-using TCPServer.Packet.Info;
+using TCPServer.Channel.Handler;
 
 namespace TCPServer.Startup
 {
@@ -33,14 +32,10 @@ namespace TCPServer.Startup
                         IChannelPipeline pipeline = channel.Pipeline;
                         pipeline.AddLast(
                             new PacketDecoder(client),
-                            new ChannelHandler(),
-                            new PacketEncoder(client)
+                            new PacketEncoder(client),
+                            new ChannelHandler()
                             );
 
-                        ServerConnected serverConnected = new ServerConnected(strMessage: "~SERVERCONNECTED\n");
-                        client.Send(serverConnected);
-
-                        Console.WriteLine("Client {0} is connected", client.Channel.RemoteAddress.ToString());
                     }))
                     .ChildOption(ChannelOption.TcpNodelay, true)
                     .ChildOption(ChannelOption.SoKeepalive, true);

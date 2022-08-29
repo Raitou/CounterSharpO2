@@ -1,4 +1,5 @@
 ﻿using Common.Packet;
+using Common.Packet.Enum;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
@@ -24,30 +25,35 @@ namespace TCPServer.Packet.Core
                     if (message.GetPacket() == null)
                         throw new Exception();
 
-                    output.WriteByte(createHeader());
-                    output.WriteByte(getSequence());
-#pragma warning disable CS8602 // Null check already defined above
-                    output.WriteShortLE(message.GetPacket().ReadableBytes);
-#pragma warning restore CS8602
-                    output.WriteBytes(message.GetPacket());
+                    if(message.PacketID != PacketID.ClientConnect)
+                    {
+                        output.WriteByte(createHeader());
+                        output.WriteByte(getSequence());
+                        output.WriteShortLE(message.ByteBuffer.ReadableBytes);
+                    }
+                    output.WriteBytes(message.ByteBuffer);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
                 finally
                 {
                     if (message.GetPacket() != null)
-#pragma warning disable CS8602 // Null check already defined above
-                        message.GetPacket().Clear();
-#pragma warning restore CS8602
+                        message.ByteBuffer.Clear();
                 }
             }
         }
 
+        private bool isInitialPacket()
+        {
+
+            return true;
+        }
+
         private byte createHeader()
         {
-            return 0x55; // PacketSignature
+            return (byte)PacketSignature.TCPSignature;
         }
 
         private byte getSequence()
