@@ -1,0 +1,3 @@
+[submodule "CSO2.Server"]
+	path = CSO2.Server
+	url = https://github.com/Raitou/CSO2.Server.git
