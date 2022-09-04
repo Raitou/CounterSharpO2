@@ -3,4 +3,4 @@
 	url = https://github.com/Raitou/CSO2.Server.git
 [submodule "CSO2.Database"]
 	path = CSO2.Database
-	url = https://raitou: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@github.com/Raitou/CSO2.Database.git
+	url = https://github.com/Raitou/CSO2.Database.git
